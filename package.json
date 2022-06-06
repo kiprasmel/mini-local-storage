@@ -1,0 +1,19 @@
+{
+  "name": "safe-local-storage",
+  "version": "0.0.0",
+  "main": "dist/safe-local-storage.js",
+  "types": "dist/safe-local-storage.d.ts",
+  "author": "Kipras Melnikovas <kipras@kipras.org> (https://kipras.org/)",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn tsc -b",
+    "prepack": "yarn build"
+  },
+  "devDependencies": {
+    "typescript": "4.7.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/kiprasmel/safe-local-storage"
+  }
+}
