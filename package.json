@@ -1,6 +1,6 @@
 {
   "name": "mini-local-storage",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "dist/mini-local-storage.js",
   "types": "dist/mini-local-storage.d.ts",
   "author": "Kipras Melnikovas <kipras@kipras.org> (https://kipras.org/)",
