@@ -1,4 +1,4 @@
-# safe-local-storage
+# mini-local-storage
 
 simple window.localStorage, with type safety
 
@@ -7,7 +7,7 @@ simple window.localStorage, with type safety
 ```ts
 // localStorage.ts
 
-import { createLocalStorage } from "safe-local-storage";
+import { createLocalStorage } from "mini-local-storage";
 
 import { FeedbackRating, FeedbackSource, FeedbackTrigger } from "../entities/feedback";
 
