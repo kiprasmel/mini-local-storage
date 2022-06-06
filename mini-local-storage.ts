@@ -12,8 +12,9 @@ export type CreateLSOptions<KV> = {
 export const createLocalStorage = <KV extends Record<string, any>>(
 	opts: CreateLSOptions<KV> = {},
 ) => {
-	const set = <T extends KV, K extends keyof T & string>(key: K, value: T[K]) => {
-		return localStorage.setItem(key, JSON.stringify(value));
+	const set = <T extends KV, K extends keyof T & string>(key: K, value: T[K]): T[K] => {
+		localStorage.setItem(key, JSON.stringify(value));
+		return value;
 	};
 
 	const has = (key: string): boolean => localStorage.getItem(key) !== null;
@@ -36,10 +37,9 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 	const appendToArray = <Ts extends KV, K extends keyof Ts & string, V extends Ts[K] & any[]>(
 		key: K,
 		value: V,
-	) => {
+	): Ts[K] => {
 		if (!has(key)) {
-			set<Ts, K>(key, value);
-			return;
+			return set<Ts, K>(key, value);
 		}
 
 		const existing: V = get<Ts, K>(key, value);
@@ -47,7 +47,7 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 			? (existing.concat(value))
 			: ([existing].concat(value));
 
-		set<Ts, K>(key, appended);
+		return set<Ts, K>(key, appended);
 	};
 
 	const storage = {
