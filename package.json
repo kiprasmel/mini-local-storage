@@ -1,8 +1,8 @@
 {
-  "name": "safe-local-storage",
-  "version": "0.0.0",
-  "main": "dist/safe-local-storage.js",
-  "types": "dist/safe-local-storage.d.ts",
+  "name": "mini-local-storage",
+  "version": "0.1.0",
+  "main": "dist/mini-local-storage.js",
+  "types": "dist/mini-local-storage.d.ts",
   "author": "Kipras Melnikovas <kipras@kipras.org> (https://kipras.org/)",
   "license": "MIT",
   "scripts": {

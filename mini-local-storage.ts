@@ -42,8 +42,10 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 			return;
 		}
 
-		const existing: V = get<Ts, K>(key, value) as V;
-		const appended: V = existing.concat(value) as V;
+		const existing: V = get<Ts, K>(key, value);
+		const appended: V = Array.isArray(existing)
+			? (existing.concat(value))
+			: ([existing].concat(value));
 
 		set<Ts, K>(key, appended);
 	};
