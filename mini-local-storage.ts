@@ -50,11 +50,18 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 		return set<Ts, K>(key, appended);
 	};
 
+	const modify = <T extends KV, K extends keyof T & string>(key: K, defaultValue: T[K], modifier: (currValue: T[K]) => T[K]): T[K] => {
+		const currValue = get<T, K>(key, defaultValue);
+		const newValue = modifier(currValue);
+		return set<T, K>(key, newValue);
+	}
+
 	const storage = {
 		set,
 		has,
 		get,
 		appendToArray,
+		modify,
 	} as const;
 
 	return storage;

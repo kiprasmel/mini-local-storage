@@ -42,6 +42,7 @@ feedbackLS.set()
 feedbackLS.has()
 feedbackLS.get()
 feedbackLS.appendToArray()
+feedbackLS.modify()
 ```
 
 ## License
