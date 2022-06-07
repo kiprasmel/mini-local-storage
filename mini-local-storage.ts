@@ -1,12 +1,12 @@
-export type OnFailParseCtx<KV> = {
+export type OnParsingFailCtx<KV> = {
 	error: unknown; //
 	key: keyof KV;
 };
 
-export type OnFailParse<KV> = ({}: OnFailParseCtx<KV>) => void;
+export type OnParsingFail<KV> = ({}: OnParsingFailCtx<KV>) => void;
 
 export type CreateLSOptions<KV> = {
-	onFailParse?: OnFailParse<KV>;
+	onParsingFail?: OnParsingFail<KV>;
 };
 
 export const createLocalStorage = <KV extends Record<string, any>>(
@@ -29,7 +29,7 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 		try {
 			return JSON.parse(item);
 		} catch (error) {
-			opts.onFailParse?.({ error, key });
+			opts.onParsingFail?.({ error, key });
 			return defaultValue;
 		}
 	};

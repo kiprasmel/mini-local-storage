@@ -21,14 +21,14 @@ export type FeedbackLS = {
 	"foo:bar:related-variable-count": number;
 };
 
-const onFailParse: OnFailParse<FeedbackLS> = ({ error, key }) => 
+const onParsingFail: OnParsingFail<FeedbackLS> = ({ error, key }) => 
 	console.error(
 		`Tried JSON.parse'ing item from localStorage (${key}), but caught error:`,
 		error,
 	);
 
 export const feedbackLS = createLocalStorage<FeedbackLS>({
-	onFailParse,
+	onParsingFail,
 });
 ```
 
