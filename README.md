@@ -7,7 +7,7 @@ simple window.localStorage, with type safety
 ```ts
 // localStorage.ts
 
-import { createLocalStorage } from "mini-local-storage";
+import { createLocalStorage, OnParsingFail } from "mini-local-storage";
 
 import { FeedbackRating, FeedbackSource, FeedbackTrigger } from "../entities/feedback";
 
