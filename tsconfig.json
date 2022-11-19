@@ -22,6 +22,7 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "removeComments": false,
+	"jsx": "react-jsx"
   },
   "exclude": [
     "node_modules", //
@@ -29,7 +30,7 @@
   ],
   "include": [
     //
-    "./src/**/*.ts",
-    "./**/*.ts"
+    "./**/*.ts",
+    "./**/*.tsx",
   ],
 }

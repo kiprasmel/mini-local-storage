@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+
 export type OnParsingFailCtx<KV> = {
 	error: unknown; //
 	key: keyof KV;
@@ -9,17 +11,39 @@ export type CreateLSOptions<KV> = {
 	onParsingFail?: OnParsingFail<KV>;
 };
 
+export type Modifier<
+	KV, //
+	T extends KV = KV,
+	K extends keyof T & string = keyof T & string,
+	V extends T[K] = T[K]
+> = (currValue: V) => V;
+
+export type LS<KV extends Record<string, any>> = {
+	readonly set: <T extends KV, K extends keyof T & string>(key: K, value: T[K]) => T[K];
+	readonly has: (key: string) => boolean;
+	readonly get: <T extends KV, K extends keyof T & string>(key: K, defaultValue: T[K]) => T[K];
+	readonly appendToArray: <Ts extends KV, K extends keyof Ts & string, V extends Ts[K] & any[]>(
+		key: K, //
+		value: V
+	) => Ts[K];
+	readonly modify: <T extends KV, K extends keyof T & string>(
+		key: K, //
+		defaultValue: T[K],
+		modifier: Modifier<KV, T, K, T[K]>
+	) => T[K];
+};
+
 export const createLocalStorage = <KV extends Record<string, any>>(
 	opts: CreateLSOptions<KV> = {} //
-) => {
-	const set = <T extends KV, K extends keyof T & string>(key: K, value: T[K]): T[K] => {
+): LS<KV> => {
+	const set: LS<KV>["set"] = <T extends KV, K extends keyof T & string>(key: K, value: T[K]): T[K] => {
 		localStorage.setItem(key, JSON.stringify(value));
 		return value;
 	};
 
-	const has = (key: string): boolean => localStorage.getItem(key) !== null;
+	const has: LS<KV>["has"] = (key: string): boolean => localStorage.getItem(key) !== null;
 
-	const get = <T extends KV, K extends keyof T & string>(key: K, defaultValue: T[K]): T[K] => {
+	const get: LS<KV>["get"] = <T extends KV, K extends keyof T & string>(key: K, defaultValue: T[K]): T[K] => {
 		if (!has(key)) {
 			return defaultValue;
 		}
@@ -34,8 +58,12 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 		}
 	};
 
-	const appendToArray = <Ts extends KV, K extends keyof Ts & string, V extends Ts[K] & any[]>(
-		key: K,
+	const appendToArray: LS<KV>["appendToArray"] = <
+		Ts extends KV, //
+		K extends keyof Ts & string,
+		V extends Ts[K] & any[]
+	>(
+		key: K, //
 		value: V
 	): Ts[K] => {
 		if (!has(key)) {
@@ -50,7 +78,7 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 		return set<Ts, K>(key, appended);
 	};
 
-	const modify = <T extends KV, K extends keyof T & string>(
+	const modify: LS<KV>["modify"] = <T extends KV, K extends keyof T & string>(
 		key: K, //
 		defaultValue: T[K],
 		modifier: (currValue: T[K]) => T[K]
@@ -60,13 +88,13 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 		return set<T, K>(key, newValue);
 	};
 
-	const storage = {
+	const storage: LS<KV> = {
 		set,
 		has,
 		get,
 		appendToArray,
 		modify,
-	} as const;
+	};
 
 	return storage;
 };

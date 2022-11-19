@@ -1,19 +1,21 @@
 {
-  "name": "mini-local-storage",
-  "version": "0.4.0",
-  "main": "dist/mini-local-storage.js",
-  "types": "dist/mini-local-storage.d.ts",
-  "author": "Kipras Melnikovas <kipras@kipras.org> (https://kipras.org/)",
-  "license": "MIT",
-  "scripts": {
-    "build": "yarn tsc -b",
-    "prepack": "yarn build"
-  },
-  "devDependencies": {
-    "typescript": "4.7.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/kiprasmel/mini-local-storage"
-  }
+	"name": "mini-local-storage",
+	"version": "0.4.0",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"author": "Kipras Melnikovas <kipras@kipras.org> (https://kipras.org/)",
+	"license": "MIT",
+	"scripts": {
+		"build": "yarn tsc -b",
+		"prepack": "yarn build"
+	},
+	"devDependencies": {
+		"@types/react": "18.0.25",
+		"typescript": "4.7.3"
+	},
+	"peerDependencies": {},
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/kiprasmel/mini-local-storage"
+	}
 }
