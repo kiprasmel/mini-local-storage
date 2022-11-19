@@ -86,8 +86,8 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 			return set<Ts, K>(key, value);
 		}
 
-		const existing: V = get<Ts, K>(key, value);
-		const appended: V = Array.isArray(existing)
+		const existing: V = get<Ts, K>(key, [] as V); // TODO TS idk why the cast is needed
+		const appended: V = Array.isArray(existing) // TODO TS we shouldn't need this check
 			? existing.concat(value) //
 			: [existing].concat(value);
 
