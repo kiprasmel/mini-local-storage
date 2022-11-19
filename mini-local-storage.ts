@@ -22,6 +22,7 @@ export type LS<KV extends Record<string, any>> = {
 	readonly set: <T extends KV, K extends keyof T & string>(key: K, value: T[K]) => T[K];
 	readonly has: (key: string) => boolean;
 	readonly get: <T extends KV, K extends keyof T & string>(key: K, defaultValue: T[K]) => T[K];
+	readonly getOr: <T extends KV, K extends keyof T & string>(key: K, or: () => T[K]) => T[K];
 	readonly appendToArray: <Ts extends KV, K extends keyof Ts & string, V extends Ts[K] & any[]>(
 		key: K, //
 		value: V
@@ -55,6 +56,21 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 		} catch (error) {
 			opts.onParsingFail?.({ error, key });
 			return defaultValue;
+		}
+	};
+
+	const getOr: LS<KV>["getOr"] = <T extends KV, K extends keyof T & string>(key: K, or: () => T[K]): T[K] => {
+		if (!has(key)) {
+			return or();
+		}
+
+		const item = localStorage.getItem(key)!;
+
+		try {
+			return JSON.parse(item);
+		} catch (error) {
+			opts.onParsingFail?.({ error, key });
+			return or();
 		}
 	};
 
@@ -92,6 +108,7 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 		set,
 		has,
 		get,
+		getOr,
 		appendToArray,
 		modify,
 	};

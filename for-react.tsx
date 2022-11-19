@@ -90,7 +90,7 @@ export const createUseLocalStorage = <KV extends Record<string, any>>(
 	): LSHook<KV, KV, K, KV[K]> {
 		type V = KV[K];
 
-		const [value, setValue] = useState<V>(() => ls.get(key, initialValue));
+		const [value, setValue] = useState<V>(() => ls.getOr(key, () => ls.set(key, initialValue)));
 
 		const get = useCallback(() => value, [value]);
 
