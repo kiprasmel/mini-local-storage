@@ -104,7 +104,7 @@ export const createUseLocalStorage = <KV extends Record<string, any>>(
 				try {
 					const valueToStore = newValue instanceof Function ? newValue(value) : newValue;
 					setValue(valueToStore);
-					ls.storageInstance.setItem(key, JSON.stringify(valueToStore));
+					ls.set(key, valueToStore);
 					return valueToStore;
 				} catch (error) {
 					// opts.onSetError?.({ error });
