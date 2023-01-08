@@ -7,8 +7,9 @@ export type OnParsingFailCtx<KV> = {
 
 export type OnParsingFail<KV> = ({}: OnParsingFailCtx<KV>) => void;
 
-export type CreateLSOptions<KV> = {
+export type CreateLSOptions<KV extends Record<string, any>> = {
 	onParsingFail?: OnParsingFail<KV>;
+	storageInstance?: LS<KV>["storageInstance"];
 };
 
 export type Modifier<
@@ -19,6 +20,7 @@ export type Modifier<
 > = (currValue: V) => V;
 
 export type LS<KV extends Record<string, any>> = {
+	storageInstance: Storage;
 	readonly set: <T extends KV, K extends keyof T & string>(key: K, value: T[K]) => T[K];
 	readonly has: (key: string) => boolean;
 	readonly get: <T extends KV, K extends keyof T & string>(key: K, defaultValue: T[K]) => T[K];
@@ -34,22 +36,24 @@ export type LS<KV extends Record<string, any>> = {
 	) => T[K];
 };
 
-export const createLocalStorage = <KV extends Record<string, any>>(
-	opts: CreateLSOptions<KV> = {} //
-): LS<KV> => {
+export const createLocalStorage = <KV extends Record<string, any>>(opts: CreateLSOptions<KV> = {}): LS<KV> => {
+	const {
+		storageInstance = localStorage, //
+	} = opts;
+
 	const set: LS<KV>["set"] = <T extends KV, K extends keyof T & string>(key: K, value: T[K]): T[K] => {
-		localStorage.setItem(key, JSON.stringify(value));
+		storageInstance.setItem(key, JSON.stringify(value));
 		return value;
 	};
 
-	const has: LS<KV>["has"] = (key: string): boolean => localStorage.getItem(key) !== null;
+	const has: LS<KV>["has"] = (key: string): boolean => storageInstance.getItem(key) !== null;
 
 	const get: LS<KV>["get"] = <T extends KV, K extends keyof T & string>(key: K, defaultValue: T[K]): T[K] => {
 		if (!has(key)) {
 			return defaultValue;
 		}
 
-		const item = localStorage.getItem(key)!;
+		const item = storageInstance.getItem(key)!;
 
 		try {
 			return JSON.parse(item);
@@ -64,7 +68,7 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 			return or();
 		}
 
-		const item = localStorage.getItem(key)!;
+		const item = storageInstance.getItem(key)!;
 
 		try {
 			return JSON.parse(item);
@@ -105,6 +109,7 @@ export const createLocalStorage = <KV extends Record<string, any>>(
 	};
 
 	const storage: LS<KV> = {
+		storageInstance,
 		set,
 		has,
 		get,

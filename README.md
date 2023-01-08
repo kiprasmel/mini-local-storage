@@ -2,7 +2,9 @@
 
 simple window.localStorage, with type safety
 
-## example
+## Example 1
+
+Regular usage:
 
 ```ts
 // localStorage.ts
@@ -43,6 +45,42 @@ feedbackLS.has()
 feedbackLS.get()
 feedbackLS.appendToArray()
 feedbackLS.modify()
+```
+
+## Example 2
+
+Providing a different `storageInstance`, e.g. `sessionStorage` (instead of the default `localStorage`):
+
+```ts
+type Project = {
+	uid: string;
+	// <...>
+};
+
+export type FooBarLS = {
+	"foo:bar:projects": Project[];
+};
+
+export type FooBarSS = {
+	// we want session storage, because we want the currently selected project *per tab*.
+	"foo:bar:projects:current": Project["uid"];
+};
+
+export const fooBarLS = createLocalStorage<FooBarLS>({
+	// localStorage by default
+});
+
+export const fooBarSS = createLocalStorage<FooBarSS>({
+	storageInstance: sessionStorage,
+});
+
+```
+
+and, if you're using our `createUseLocalStorage` for react, the custom provided `storageInstance` will be automatically there.
+
+```ts
+// the custom `storageInstance` works out of the box.
+export const useFooBarSessionStorage = createUseLocalStorage(fooBarSS);
 ```
 
 ## License

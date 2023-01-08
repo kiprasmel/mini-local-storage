@@ -9,10 +9,11 @@ import { useState, useCallback } from "react";
 
 import { LS, Modifier } from "./mini-local-storage";
 
-export type CreateUseBasicLocalStorageOpts<KV> = {
+export type CreateUseBasicLocalStorageOpts<KV extends Record<string, any>> = {
 	initialValues?: {
 		[K in keyof KV]?: KV[K];
 	};
+	storageInstance?: LS<KV>["storageInstance"];
 };
 
 export const createUseBasicLocalStorage = <KV extends Record<string, any>>(
@@ -23,9 +24,13 @@ export const createUseBasicLocalStorage = <KV extends Record<string, any>>(
 		key: K, //
 		initialValue: V | undefined = opts.initialValues?.[key]
 	) {
+		const {
+			storageInstance = localStorage, //
+		} = opts;
+
 		const [storedValue, setStoredValue] = useState<V>(() => {
 			try {
-				const item = localStorage.getItem(key);
+				const item = storageInstance.getItem(key);
 				return item ? JSON.parse(item) : initialValue;
 			} catch (error) {
 				// opts.onGetError?.({ error });
@@ -38,7 +43,7 @@ export const createUseBasicLocalStorage = <KV extends Record<string, any>>(
 				try {
 					const valueToStore = value instanceof Function ? value(storedValue) : value;
 					setStoredValue(valueToStore);
-					localStorage.setItem(key, JSON.stringify(valueToStore));
+					storageInstance.setItem(key, JSON.stringify(valueToStore));
 					return valueToStore;
 				} catch (error) {
 					// opts.onSetError?.({ error });
@@ -99,7 +104,7 @@ export const createUseLocalStorage = <KV extends Record<string, any>>(
 				try {
 					const valueToStore = newValue instanceof Function ? newValue(value) : newValue;
 					setValue(valueToStore);
-					localStorage.setItem(key, JSON.stringify(valueToStore));
+					ls.storageInstance.setItem(key, JSON.stringify(valueToStore));
 					return valueToStore;
 				} catch (error) {
 					// opts.onSetError?.({ error });
