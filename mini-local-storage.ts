@@ -72,8 +72,7 @@ export const createLocalStorage = <KV extends Record<string, any>>(opts: CreateL
 
 		try {
 			return JSON.parse(item);
-		} catch (error) {
-			opts.onParsingFail?.({ error, key });
+		} catch {
 			return or();
 		}
 	};

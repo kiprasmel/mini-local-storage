@@ -63,6 +63,7 @@ export type CreateUseLocalStorageOpts<KV> = CreateUseBasicLocalStorageOpts<KV> &
 export type LSHook<KV, T extends KV, K extends keyof T & string, V extends T[K]> = {
 	readonly value: V;
 	readonly get: () => V;
+	readonly getOr: (or: () => V) => V;
 	readonly set: (newValue: V | ((prevVal: V) => V)) => V | undefined;
 	readonly has: () => boolean;
 	readonly modify: (modifier: Modifier<KV, T, K, V>) => void;
@@ -98,6 +99,8 @@ export const createUseLocalStorage = <KV extends Record<string, any>>(
 		const [value, setValue] = useState<V>(() => ls.getOr(key, () => ls.set(key, initialValue)));
 
 		const get = useCallback(() => value, [value]);
+
+		const getOr = useCallback((or: () => KV[K]) => ls.getOr<KV, K>(key, or), []);
 
 		const set = useCallback(
 			(newValue: V | ((prevVal: V) => V)) => {
@@ -136,6 +139,7 @@ export const createUseLocalStorage = <KV extends Record<string, any>>(
 		return {
 			value,
 			get,
+			getOr,
 			set,
 			has,
 			appendToArray,
