@@ -7,16 +7,16 @@
 
 import { useState, useCallback } from "react";
 
-import { LS, Modifier } from "./mini-local-storage";
+import { DefaultKV, LS, Modifier } from "./mini-local-storage";
 
-export type CreateUseBasicLocalStorageOpts<KV extends Record<string, any>> = {
+export type CreateUseBasicLocalStorageOpts<KV extends DefaultKV> = {
 	initialValues?: {
 		[K in keyof KV]?: KV[K];
 	};
 	storageInstance?: LS<KV>["storageInstance"];
 };
 
-export const createUseBasicLocalStorage = <KV extends Record<string, any>>(
+export const createUseBasicLocalStorage = <KV extends DefaultKV>(
 	opts: CreateUseBasicLocalStorageOpts<KV> = {}
 ) =>
 	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -56,7 +56,7 @@ export const createUseBasicLocalStorage = <KV extends Record<string, any>>(
 		return [storedValue, setValue] as const;
 	};
 
-export type CreateUseLocalStorageOpts<KV> = CreateUseBasicLocalStorageOpts<KV> & {
+export type CreateUseLocalStorageOpts<KV extends DefaultKV> = CreateUseBasicLocalStorageOpts<KV> & {
 	//
 };
 
@@ -86,7 +86,7 @@ export type LSHook<KV, T extends KV, K extends keyof T & string, V extends T[K]>
  * if you're using this,
  * you might find redux toolkit + persistance to local storage more useful.
  */
-export const createUseLocalStorage = <KV extends Record<string, any>>(
+export const createUseLocalStorage = <KV extends DefaultKV>(
 	ls: LS<KV> //
 	// opts: CreateUseLocalStorageOpts<KV> = {}
 ) =>

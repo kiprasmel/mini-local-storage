@@ -1,5 +1,7 @@
 /* eslint-disable indent */
 
+export type DefaultKV = Record<string, any>;
+
 export type OnParsingFailCtx<KV> = {
 	error: unknown; //
 	key: keyof KV;
@@ -7,7 +9,7 @@ export type OnParsingFailCtx<KV> = {
 
 export type OnParsingFail<KV> = ({}: OnParsingFailCtx<KV>) => void;
 
-export type CreateLSOptions<KV extends Record<string, any>> = {
+export type CreateLSOptions<KV extends DefaultKV> = {
 	onParsingFail?: OnParsingFail<KV>;
 	storageInstance?: LS<KV>["storageInstance"];
 };
@@ -19,7 +21,7 @@ export type Modifier<
 	V extends T[K] = T[K]
 > = (currValue: V) => V;
 
-export type LS<KV extends Record<string, any>> = {
+export type LS<KV extends DefaultKV> = {
 	storageInstance: Storage;
 	readonly set: <T extends KV, K extends keyof T & string>(key: K, value: T[K]) => T[K];
 	readonly has: (key: string) => boolean;
@@ -36,7 +38,7 @@ export type LS<KV extends Record<string, any>> = {
 	) => T[K];
 };
 
-export const createLocalStorage = <KV extends Record<string, any>>(opts: CreateLSOptions<KV> = {}): LS<KV> => {
+export const createLocalStorage = <KV extends DefaultKV>(opts: CreateLSOptions<KV> = {}): LS<KV> => {
 	const {
 		storageInstance = localStorage, //
 	} = opts;
