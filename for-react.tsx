@@ -5,9 +5,9 @@
  * https://usehooks.com/useLocalStorage/
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 
-import { DefaultKV, LS, Modifier } from "./mini-local-storage";
+import { DefaultKV, LS, Modifier, createLocalStorage } from "./mini-local-storage";
 
 export type CreateUseBasicLocalStorageOpts<KV extends DefaultKV> = {
 	initialValues?: {
@@ -86,63 +86,86 @@ export type LSHook<KV, T extends KV, K extends keyof T & string, V extends T[K]>
  * if you're using this,
  * you might find redux toolkit + persistance to local storage more useful.
  */
-export const createUseLocalStorage = <KV extends DefaultKV>(
-	ls: LS<KV> //
-	// opts: CreateUseLocalStorageOpts<KV> = {}
-) =>
-	function useLocalStorage<K extends keyof KV & (string & {})>(
-		key: K, //
-		initialValue: KV[K] // = opts.initialValues?.[key]
-	): LSHook<KV, KV, K, KV[K]> {
-		type V = KV[K];
+export const createUseLocalStorage =
+	<KV extends DefaultKV>(
+		ls: LS<KV> //
+		// opts: CreateUseLocalStorageOpts<KV> = {}
+	) =>
+	<K extends keyof KV & (string & {})>(key: K, initialValue: KV[K]) =>
+		useCreatedLocalStorage(ls, key, initialValue);
 
-		const [value, setValue] = useState<V>(() => ls.getOr(key, () => ls.set(key, initialValue)));
+export function useCreatedLocalStorage<KV extends DefaultKV, K extends keyof KV & (string & {})>(
+	ls: LS<KV>,
+	key: K, //
+	initialValue: KV[K] // = opts.initialValues?.[key]
+): LSHook<KV, KV, K, KV[K]> {
+	type V = KV[K];
 
-		const get = useCallback(() => value, [value]);
+	const [value, setValue] = useState<V>(() => ls.getOr(key, () => ls.set(key, initialValue)));
 
-		const getOr = useCallback((or: () => KV[K]) => ls.getOr<KV, K>(key, or), []);
+	const get = useCallback(() => value, [value]);
 
-		const set = useCallback(
-			(newValue: V | ((prevVal: V) => V)) => {
-				try {
-					const valueToStore = newValue instanceof Function ? newValue(value) : newValue;
-					setValue(valueToStore);
-					ls.set(key, valueToStore);
-					return valueToStore;
-				} catch (error) {
-					// opts.onSetError?.({ error });
-					return value;
-				}
-			},
-			[key, value]
-		);
+	const getOr = useCallback((or: () => KV[K]) => ls.getOr<KV, K>(key, or), []);
 
-		const has = useCallback(() => ls.has(key), [key]);
+	const set = useCallback(
+		(newValue: V | ((prevVal: V) => V)) => {
+			try {
+				const valueToStore = newValue instanceof Function ? newValue(value) : newValue;
+				setValue(valueToStore);
+				ls.set(key, valueToStore);
+				return valueToStore;
+			} catch (error) {
+				// opts.onSetError?.({ error });
+				return value;
+			}
+		},
+		[key, value]
+	);
 
-		const appendToArray = useCallback((extraValue: V) => setValue(ls.appendToArray(key, extraValue)), [key]);
+	const has = useCallback(() => ls.has(key), [key]);
 
-		const modify = useCallback(
-			(
-				modifier: Modifier<KV, KV, K, V> //
-			) => {
-				set(
-					ls.modify(
-						key, //
-						get(),
-						modifier
-					)
-				);
-			},
-			[key, get, set]
-		);
+	const appendToArray = useCallback((extraValue: V) => setValue(ls.appendToArray(key, extraValue)), [key]);
 
-		return {
-			value,
-			get,
-			getOr,
-			set,
-			has,
-			appendToArray,
-			modify,
-		};
-	};
+	const modify = useCallback(
+		(
+			modifier: Modifier<KV, KV, K, V> //
+		) => {
+			set(
+				ls.modify(
+					key, //
+					get(),
+					modifier
+				)
+			);
+		},
+		[key, get, set]
+	);
+
+	const LS = useMemo(() => ({
+		value,
+		get,
+		getOr,
+		set,
+		has,
+		appendToArray,
+		modify,
+	}), []);
+
+	return LS;
+}
+
+export type UseLocalStorageOpts<KV extends DefaultKV> = Pick<CreateUseBasicLocalStorageOpts<KV>, "storageInstance"> & {
+	//
+};
+
+export function useLocalStorage<KV extends DefaultKV, K extends keyof KV & (string & {})>(
+	key: K,
+	initialValue: KV[K],
+	{ storageInstance }: UseLocalStorageOpts<KV>
+) {
+	const createdLS = useRef(createLocalStorage({ storageInstance }));
+
+	const LS = useCreatedLocalStorage<KV, K>(createdLS.current, key, initialValue);
+
+	return LS;
+}
